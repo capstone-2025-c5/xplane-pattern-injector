@@ -245,7 +245,7 @@
 				CURRENT_PROJECT_VERSION = 3.1.0;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DSTROOT = "$(XPLANE11_ROOT)/Resources/plugins/$(PROJECT)";
+				DSTROOT = "$(XPLANE_ROOT)/Resources/plugins/$(PROJECT)";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -310,7 +310,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.twinfan.XPMP2-Sample";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = macosx;
-				XPLANE11_ROOT = "$(USER_APPS_DIR)/X-Plane/11";
+				XPLANE_ROOT = "$(USER_APPS_DIR)/X-Plane/12";
 			};
 			name = Debug;
 		};
@@ -350,7 +350,7 @@
 				CURRENT_PROJECT_VERSION = 3.1.0;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DSTROOT = "$(XPLANE11_ROOT)/Resources/plugins/$(PROJECT)";
+				DSTROOT = "$(XPLANE_ROOT)/Resources/plugins/$(PROJECT)";
 				DYLIB_COMPATIBILITY_VERSION = "";
 				DYLIB_CURRENT_VERSION = "";
 				ENABLE_NS_ASSERTIONS = NO;
@@ -413,7 +413,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.twinfan.XPMP2-Sample";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = macosx;
-				XPLANE11_ROOT = "$(USER_APPS_DIR)/X-Plane/11";
+				XPLANE_ROOT = "$(USER_APPS_DIR)/X-Plane/12";
 			};
 			name = Release;
 		};
@@ -424,7 +424,6 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_LOCATION = YES;
 				INSTALL_PATH = mac_x64;
-				VALID_ARCHS = x86_64;
 			};
 			name = Debug;
 		};
@@ -435,7 +434,6 @@
 				DEAD_CODE_STRIPPING = YES;
 				DEPLOYMENT_LOCATION = YES;
 				INSTALL_PATH = mac_x64;
-				VALID_ARCHS = x86_64;
 			};
 			name = Release;
 		};

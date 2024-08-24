@@ -42,7 +42,7 @@
       allowLocationSimulation = "YES">
       <PathRunnable
          runnableDebuggingMode = "0"
-         FilePath = "/Users/birger/Applications/X-Plane/11/X-Plane.app">
+         FilePath = "/Users/birger/Applications/X-Plane/12/X-Plane.app">
       </PathRunnable>
    </LaunchAction>
    <ProfileAction
