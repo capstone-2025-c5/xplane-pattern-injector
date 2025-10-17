@@ -72,6 +72,7 @@
 #include "XPLMPlugin.h"
 #include "XPLMGraphics.h"
 #include "XPLMMenus.h"
+#include "XPLMCamera.h"
 
 // Include XPMP2 headers
 #include "XPCAircraft.h"
@@ -818,6 +819,7 @@ enum MenuItemsTy {
     MENU_CYCLE_MDL,         ///< Menu Item "Cycle Models"
     MENU_REMATCH_MDL,       ///< Menu Item "Rematch Models"
     MENU_AI,                ///< Menu Item "Toggle AI control"
+    MENU_CAMERA_VIEW,       ///< Menu Item "Runway Approach View"
 };
 
 /// Planes currently visible?
@@ -828,6 +830,41 @@ bool gbMapLabels = true;
 
 /// for cycling CSL models: what is the index used for the first plane?
 int gModelIdxBase = 0;
+
+/// Camera view currently active?
+bool gbCameraViewActive = false;
+
+/// Stored camera position for runway approach view
+struct CameraPosition {
+    float x = 27966.35546875f;
+    float y = 1337.873779296875f;
+    float z = 34814.58203125f;
+    float pitch = 10.39390754699707f;
+    float heading = 117.79322052001953f;
+    float roll = 9.365397204419423e-07f;
+    float zoom = 1.0f;
+} gRunwayCamera;
+
+/// Camera control callback
+int CameraControlCallback(XPLMCameraPosition_t* outCameraPosition, int inIsLosingControl, void* inRefcon)
+{
+    if (inIsLosingControl) {
+        // Another plugin or X-Plane is taking control
+        gbCameraViewActive = false;
+        return 0; // Give up control
+    }
+    
+    // Set our custom camera position
+    outCameraPosition->x = gRunwayCamera.x;
+    outCameraPosition->y = gRunwayCamera.y;
+    outCameraPosition->z = gRunwayCamera.z;
+    outCameraPosition->pitch = gRunwayCamera.pitch;
+    outCameraPosition->heading = gRunwayCamera.heading;
+    outCameraPosition->roll = gRunwayCamera.roll;
+    outCameraPosition->zoom = gRunwayCamera.zoom;
+    
+    return 1; // Keep control
+}
 
 /// Is any plane object created?
 inline bool ArePlanesCreated () { return pSamplePlanes[0] != nullptr; }
@@ -932,12 +969,29 @@ void PlanesRematch ()
   }
 }
 
+/// Toggle the runway approach camera view
+void ToggleCameraView ()
+{
+    gbCameraViewActive = !gbCameraViewActive;
+    
+    if (gbCameraViewActive) {
+        // Take control of the camera using X-Plane's camera control API
+        XPLMControlCamera(xplm_ControlCameraForever, CameraControlCallback, nullptr);
+        LogMsg("Camera view activated - looking at runway approach");
+    } else {
+        // Release camera control - X-Plane will keep the camera at current position
+        XPLMDontControlCamera();
+        LogMsg("Camera view deactivated - camera released");
+    }
+}
+
 void MenuUpdateCheckmarks ()
 {
     XPLMCheckMenuItem(hMenu, MENU_PLANES,   ArePlanesCreated()           ? xplm_Menu_Checked : xplm_Menu_Unchecked);
     XPLMCheckMenuItem(hMenu, MENU_VISIBLE,  gbVisible                    ? xplm_Menu_Checked : xplm_Menu_Unchecked);
     XPLMCheckMenuItem(hMenu, MENU_FREEZE,   gbFreeze                     ? xplm_Menu_Checked : xplm_Menu_Unchecked);
     XPLMCheckMenuItem(hMenu, MENU_AI,       XPMPHasControlOfAIAircraft() ? xplm_Menu_Checked : xplm_Menu_Unchecked);
+    XPLMCheckMenuItem(hMenu, MENU_CAMERA_VIEW, gbCameraViewActive       ? xplm_Menu_Checked : xplm_Menu_Unchecked);
 }
 
 /// Callback function for the case that we might get AI access later
@@ -983,6 +1037,10 @@ void CBMenu (void* /*inMenuRef*/, void* inItemRef)
                 // When requested by menu we actually wait via callback to get control
                 XPMPMultiplayerEnable(CPRequestAIAgain);
             break;
+            
+        case MENU_CAMERA_VIEW:                  // Toggle runway approach camera view?
+            ToggleCameraView();
+            break;
     }
 
     // Update menu items' checkmarks
@@ -1014,6 +1072,7 @@ PLUGIN_API int XPluginStart(char* outName, char* outSig, char* outDesc)
     XPLMAppendMenuItem(hMenu, "Cycle Models",       (void*)MENU_CYCLE_MDL, 0);
     XPLMAppendMenuItem(hMenu, "Rematch Models",     (void*)MENU_REMATCH_MDL, 0);
     XPLMAppendMenuItem(hMenu, "Toggle AI control",  (void*)MENU_AI, 0);
+    XPLMAppendMenuItem(hMenu, "Runway Approach View", (void*)MENU_CAMERA_VIEW, 0);
     MenuUpdateCheckmarks();
 	return 1;
 }
@@ -1081,6 +1140,12 @@ PLUGIN_API int XPluginEnable(void)
 
 PLUGIN_API void XPluginDisable(void)
 {
+    // Release camera control if active
+    if (gbCameraViewActive) {
+        XPLMDontControlCamera();
+        gbCameraViewActive = false;
+    }
+
     // Remove the planes
     PlanesRemove();
 

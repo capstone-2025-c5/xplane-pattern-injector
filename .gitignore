@@ -14,3 +14,31 @@ xcuserdata/
 *.mode2v3
 *.perspectivev3
 *.pbxuser
+# CMake generated files and directories
+build/
+cmake-build-*/
+CMakeCache.txt
+CMakeFiles/
+Makefile
+cmake_install.cmake
+install_manifest.txt
+CTestTestfile.cmake
+_CPack_Packages/
+DartConfiguration.tcl
+build.ninja
+
+# IDE specific files (adjust based on your IDE)
+.vscode/
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Operating System specific files
+.DS_Store
+Thumbs.db
+
+# Other common temporary files
+*.log
+*.swp
+*~
